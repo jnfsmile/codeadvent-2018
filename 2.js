@@ -327,3 +327,42 @@ function checksum(idList) {
 }
 
 console.log(checksum(input));
+
+/*************
+ * part 2
+ */
+
+const ut8 = (input => simiHash(input))(`abcde`);
+assert(ut8.abcd);
+assert(ut8.abce);
+assert(ut8.abde);
+assert(ut8.acde);
+assert(ut8.bcde);
+
+function simiHash(id) {
+  const hash = {};
+  for (let i = 0; i < id.length; i++) {
+    if (i > 0) {
+      hash[id.substring(0, i) + id.substring(i + 1)] = true;
+    } else {
+      hash[id.substring(i + 1)] = true;
+    }
+  }
+  return hash;
+}
+
+function simiIds(ids) {
+  const inputArr = ids.split("\n");
+  let hash = {};
+  for (let i = 0; i < inputArr.length; i++) {
+    const newHash = simiHash(inputArr[i]);
+    for (let s in newHash) {
+      if (newHash.hasOwnProperty(s)) {
+        if (hash[s]) return s;
+      }
+    }
+    hash = Object.assign(newHash, hash);
+  }
+}
+
+console.log(simiIds(input));
