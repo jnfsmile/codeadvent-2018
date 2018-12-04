@@ -1,70 +1,67 @@
-let ut1 = ((input) => twoLetter(input))(`abcdef`)
-assert(ut1 === false)
+let ut1 = (input => twoLetter(input))(`abcdef`);
+assert(ut1 === false);
 
-let ut2 = ((input) => twoLetter(input))(`bababc`)
-assert(ut2 === true)
+let ut2 = (input => twoLetter(input))(`bababc`);
+assert(ut2 === true);
 
-let ut3 = ((input) => twoLetter(input))(`abbcde`)
-assert(ut3 === true)
+let ut3 = (input => twoLetter(input))(`abbcde`);
+assert(ut3 === true);
 
-let ut4 = ((input) => twoLetter(input))(`abcccd`)
-assert(ut4 === false)
+let ut4 = (input => twoLetter(input))(`abcccd`);
+assert(ut4 === false);
 
-let ut5 = ((input) => twoLetter(input))(`aabcdd`)
-assert(ut5 === true)
+let ut5 = (input => twoLetter(input))(`aabcdd`);
+assert(ut5 === true);
 
-let ut6 = ((input) => twoLetter(input))(`abcdee`)
-assert(ut6 === true)
+let ut6 = (input => twoLetter(input))(`abcdee`);
+assert(ut6 === true);
 
-let ut7 = ((input) => twoLetter(input))(`ababab`)
-assert(ut7 === false)
+let ut7 = (input => twoLetter(input))(`ababab`);
+assert(ut7 === false);
 
-let ut1_1 = ((input) => threeLetter(input))(`abcdef`)
-assert(ut1_1 === false)
+let ut1_1 = (input => threeLetter(input))(`abcdef`);
+assert(ut1_1 === false);
 
-let ut2_1 = ((input) => threeLetter(input))(`bababc`)
-assert(ut2_1 === true)
+let ut2_1 = (input => threeLetter(input))(`bababc`);
+assert(ut2_1 === true);
 
-let ut3_1 = ((input) => threeLetter(input))(`abbcde`)
-assert(ut3_1 === false)
+let ut3_1 = (input => threeLetter(input))(`abbcde`);
+assert(ut3_1 === false);
 
-let ut4_1 = ((input) => threeLetter(input))(`abcccd`)
-assert(ut4_1 === true)
+let ut4_1 = (input => threeLetter(input))(`abcccd`);
+assert(ut4_1 === true);
 
-let ut5_1 = ((input) => threeLetter(input))(`aabcdd`)
-assert(ut5_1 === false)
+let ut5_1 = (input => threeLetter(input))(`aabcdd`);
+assert(ut5_1 === false);
 
-let ut6_1 = ((input) => threeLetter(input))(`abcdee`)
-assert(ut6_1 === false)
+let ut6_1 = (input => threeLetter(input))(`abcdee`);
+assert(ut6_1 === false);
 
-let ut7_1 = ((input) => threeLetter(input))(`ababab`)
-assert(ut7_1 === true)
+let ut7_1 = (input => threeLetter(input))(`ababab`);
+assert(ut7_1 === true);
 
 function twoLetter(id) {
-    return numLetter(id, 2);
+  return numLetter(id, 2);
 }
 function threeLetter(id) {
-    return numLetter(id, 3);
+  return numLetter(id, 3);
 }
 
 function numLetter(id, num) {
-    let str = id;
-    const hash = {};
-    while(str.length) {
-        const ch = str[0];
-        hash[ch] = hash[ch] !== undefined ? hash[ch] += 1 : 1;
-        str = str.slice(1);
+  let str = id;
+  const hash = {};
+  while (str.length) {
+    const ch = str[0];
+    hash[ch] = hash[ch] !== undefined ? (hash[ch] += 1) : 1;
+    str = str.slice(1);
+  }
+  for (let ch in hash) {
+    if (hash.hasOwnProperty(ch)) {
+      if (hash[ch] === num) return true;
     }
-    for (let ch in hash) {
-        if (hash.hasOwnProperty(ch)) {
-            if (hash[ch] === num) return true;
-        }
-    }
-    return false    
+  }
+  return false;
 }
-
-
-
 
 const input = `myhposlqgeauywfikztndcvrqr
 mbhposlxfeauywoikztndcvjqi
@@ -315,12 +312,18 @@ mzhposixgenuywfikztndcvjqr
 mbhposgxgeauywyikztndvvjqr
 mbhposajgeauywfikztzdcvjqr
 mbhyoslxgeauywfikzsndcvxqr
-mbhposlxgdauywfikmtndcljqr`
+mbhposlxgdauywfikmtndcljqr`;
 
 function checksum(idList) {
-    const count2 = idList.split("\n").map( id => twoLetter(id)?1:0).reduce( (s, n) => s+n, 0)
-    const count3 = idList.split("\n").map( id => threeLetter(id)?1:0).reduce( (s, n) => s+n, 0)
-    return count2*count3
+  const count2 = idList
+    .split("\n")
+    .map(id => (twoLetter(id) ? 1 : 0))
+    .reduce((s, n) => s + n, 0);
+  const count3 = idList
+    .split("\n")
+    .map(id => (threeLetter(id) ? 1 : 0))
+    .reduce((s, n) => s + n, 0);
+  return count2 * count3;
 }
 
-console.log(checksum(input))
+console.log(checksum(input));
