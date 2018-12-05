@@ -50,20 +50,21 @@ let ut4 = ((input, id) => guardTotalSleep(input, id))(
 );
 assert(ut4 === 50);
 
-let ut5 = ((input) => getIds(input))(utInput);
+let ut5 = (input => getIds(input))(utInput);
 assert(ut5.size === 2);
 assert(ut5.has(10));
 assert(ut5.has(99));
 
-let ut6 = ((input) => maxSleeper(input))(utInput);
+let ut6 = (input => maxSleeper(input))(utInput);
 assert(ut6 === 10);
 
-let ut7 = ((input) => guardMinuteSleep(input))(guardRecords(utInput, 10));
-assert(ut7 === 24);
+let ut7 = (input => minuteMostSleptForGuard(input))(guardRecords(utInput, 10));
+assert(ut7.min === 24);
+assert(ut7.times === 2);
 
-let ut8 = ((input) => {
-  const m = maxSleeper(input)
-  return m*guardMinuteSleep(guardRecords(input,m))
+let ut8 = (input => {
+  const m = maxSleeper(input);
+  return m * minuteMostSleptForGuard(guardRecords(input, m)).min;
 })(utInput);
 assert(ut8 === 240);
 
@@ -78,11 +79,11 @@ function maxSleeper(records) {
   return max.id;
 }
 
-function guardMinuteSleep(records) {
+function minuteMostSleptForGuard(guardRecords) {
   const minutesSlept = new Map();
   let start = -1;
-  for (let i = 0; i < records.length; i++) {
-    const record = records[i];
+  for (let i = 0; i < guardRecords.length; i++) {
+    const record = guardRecords[i];
     if (record.includes("asleep")) {
       start = Number(
         record.substring(record.indexOf(":") + 1, record.indexOf("]"))
@@ -95,16 +96,18 @@ function guardMinuteSleep(records) {
       const mins = Array(end - start)
         .fill()
         .map((_, idx) => start + idx);
-        mins.forEach(
-          elem => (!minutesSlept.has(elem)) ? minutesSlept.set(elem, 1) : minutesSlept.set(elem, minutesSlept.get(elem)+1)
-        )
+      mins.forEach(elem =>
+        !minutesSlept.has(elem)
+          ? minutesSlept.set(elem, 1)
+          : minutesSlept.set(elem, minutesSlept.get(elem) + 1)
+      );
     }
   }
-  let max = {min: -1, times: 0}
+  let max = { min: -1, times: 0 };
   for (let [min, times] of minutesSlept) {
-    if (times > max.times) max = {min, times}
+    if (times > max.times) max = { min, times };
   }
-  return max.min;
+  return max;
 }
 
 function getIds(input) {
@@ -172,7 +175,6 @@ function guardTotalSleep(records) {
   }
   return total;
 }
-
 
 let input = `[1518-03-18 00:03] Guard #3529 begins shift
 [1518-04-26 00:55] wakes up
@@ -1132,9 +1134,31 @@ let input = `[1518-03-18 00:03] Guard #3529 begins shift
 [1518-06-04 00:07] falls asleep
 [1518-05-16 00:03] Guard #251 begins shift`.split("\n");
 
-const sortedInput = sortByDate(input.slice())
+const sortedInput = sortByDate(input.slice());
 
-const m = maxSleeper(sortedInput)
+const m = maxSleeper(sortedInput);
 
-const g = guardMinuteSleep(guardRecords(sortedInput,m))
-console.log(m*g)
+const g = minuteMostSleptForGuard(guardRecords(sortedInput, m));
+const res1 = m * g;
+
+/**************
+ * part 2
+ */
+
+let ut9 = (input => minuteMostSlept(input))(utInput);
+assert(ut9.id === 99);
+assert(ut9.times === 3);
+assert(ut9.min === 45);
+assert(ut9.min*ut9.id === 4455)
+
+function minuteMostSlept(records) {
+  let max = { times: 0, min: 0, id: 0 };
+  for (id of getIds(records)) {
+    const {min, times} = minuteMostSleptForGuard(guardRecords(records, id))
+    if (times > max.times) max = {times, min, id}
+  }
+  return max;
+}
+
+const mms = minuteMostSlept(sortedInput)
+console.log(mms.id*mms.min)
