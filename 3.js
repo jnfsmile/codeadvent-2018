@@ -1,25 +1,26 @@
 let ut1 = (input => usedFabric(input))(`#1 @ 1,3: 4x4`);
-assert(ut1["1,3"]);
-assert(ut1["1,4"]);
-assert(ut1["1,5"]);
-assert(ut1["1,6"]);
-assert(ut1["4,3"]);
-assert(ut1["4,4"]);
-assert(ut1["4,5"]);
-assert(ut1["4,6"]);
-ut1;
+assert(ut1.has("1,3"));
+assert(ut1.has("1,4"));
+assert(ut1.has("1,5"));
+assert(ut1.has("1,6"));
+assert(ut1.has("4,3"));
+assert(ut1.has("4,4"));
+assert(ut1.has("4,5"));
+assert(ut1.has("4,6"));
 
-let ut2 = (input => findOverlap(input))(`#1 @ 1,3: 4x4
+let ut2 = (input => findOverlap(input.split("\n")))(`#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2`);
+ut2;
 assert(ut2 === 4);
-let ut3 = (input => findOverlap(input))(`#1 @ 1,3: 4x4
+
+let ut3 = (input => findOverlap(input.split("\n")))(`#1 @ 1,3: 4x4
 #2 @ 3,1: 4x3
 #3 @ 5,5: 2x2`);
 assert(ut3 === 2);
 
 function usedFabric(claim) {
-  let hash = {};
+  let hash = new Map();
   let start = claim.substring(claim.indexOf("@") + 2, claim.indexOf(":"));
   let size = claim.substring(claim.indexOf(":") + 2);
   let [startX, startY] = start.split(",").map(Number);
@@ -27,33 +28,29 @@ function usedFabric(claim) {
   for (let i = 0; i < width; i++) {
     for (let j = 0; j < height; j++) {
       const key = startX + i + "," + (startY + j);
-      hash[key] = 1;
+      hash.set(key, 1);
     }
   }
-  hash;
   return hash;
 }
 
 function findOverlap(claims) {
-  const fab = claims.split("\n").map(usedFabric);
-  const allHash = {};
+  const fab = claims.map(usedFabric);
+  const allHash = new Map();
   let sum = 0;
-  fab;
-  for (let i = 0; i < fab.length; i++) {
-    for (let s in fab[i]) {
-      if (fab[i].hasOwnProperty(s)) {
-        if (Number.isInteger(allHash[s])) {
-          allHash[s]++;
-          if (allHash[s] === 1) {
-            sum++;
-          }
-        } else {
-          allHash[s] = 0;
+  for (let pointMap of fab.values()) {
+    for (let point of pointMap.keys()) {
+      if (allHash.has(point)) {
+          let x = allHash.get(point)
+          allHash.set(point, x+1)
+        if (allHash.get(point) === 1) {
+          sum++;
         }
+      } else {
+        allHash.set(point, 0);
       }
     }
   }
-  //console.log(allHash);
   return sum;
 }
 
@@ -1467,4 +1464,6 @@ const input = `#1 @ 151,671: 11x15
 #1408 @ 208,741: 14x17
 #1409 @ 285,437: 10x26`;
 
-console.log(findOverlap(input));
+const sinput = input.split("\n");
+const res = findOverlap(sinput);
+res;
