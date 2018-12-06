@@ -34,12 +34,11 @@ function getMaxArea(coords, border = 0) {
   square.minY -= border;
   square.maxY += border;
   const mapped = evalSquare(coords, square);
-  let filtered = new Set()
+  let filtered = new Set();
 
   let list = coords.slice();
   const areas = new Map();
   //remove infinite areas - anyone who got to the edge of the square
-  console.log(mapped)
   for ([coord, p] of mapped) {
     const x = coord.split(",").map(Number)[0];
     const y = coord.split(",").map(Number)[1];
@@ -50,10 +49,9 @@ function getMaxArea(coords, border = 0) {
       y === square.maxY
     ) {
       list = list.filter(d => d[0] !== p.x && d[1] !== p.y);
-      filtered.add(p.x+","+p.y)
+      filtered.add(p.x + "," + p.y);
     }
   }
-  console.log(filtered)
   for ([coord, p] of mapped) {
     const key = p.x + "," + p.y;
     if (list.map(c => c.toString()).includes(key)) {
@@ -65,7 +63,6 @@ function getMaxArea(coords, border = 0) {
   for ([c, d] of areas) {
     if (d > maxArea.d) maxArea = { c, d };
   }
-  console.log(areas)
   return maxArea;
 }
 
@@ -105,7 +102,7 @@ function getSquare(coords) {
     if (p[1] < square.minY) square.minY = p[1];
     if (p[1] > square.maxY) square.maxY = p[1];
   });
-  const border = 1
+  const border = 1;
   square.minX -= border;
   square.maxX += border;
   square.minY -= border;
@@ -171,3 +168,34 @@ const input = `118, 274
   .map(p => p.split(", ").map(Number));
 let res = getMaxArea(input, 0);
 res; //
+
+/**********
+ * part 2
+ */
+
+let ut6 = ((input, sq, min) => evalSafeSquare(input, sq, min))(
+  utInput,
+  getSquare(utInput),
+  32
+);
+assert(ut6.size === 16)
+
+function evalSafeSquare(coords, square, min) {
+  const map = new Map();
+  for (let x = square.minX; x <= square.maxX; x++) {
+    for (let y = square.minY; y <= square.maxY; y++) {
+      let totDis = { d: 0, x, y };
+      coords.forEach(c => {
+        const d = manhattanDistance(c, [x, y]);
+        totDis.d += d;
+      });
+      if (totDis.d < min) {
+        map.set(x + "," + y, totDis);
+      }
+    }
+  }
+  return map;
+}
+
+let res2 = evalSafeSquare(input, getSquare(input), 10000)
+console.log(res2.size)
