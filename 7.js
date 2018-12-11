@@ -175,3 +175,57 @@ Step J must be finished before step S can begin.
 Step P must be finished before step Z can begin.`)
 let res =doAll(input)
 res
+
+/*******
+ * part 2
+ */
+const ut4 =  ((i,d,w)=>doAllWithTime(i,d,w))(utInput,0,2)
+assert(ut4.stepsDone === "CABFDE")
+assert(ut4.time === 15)
+
+function doAllWithTime(data, delay, workerAmount) {
+    let stepsDone = ""
+    let steps = data.steps.slice()
+    let deps = new Map(data.deps)
+    let workers =new Map()
+    let time = 0
+    const delays = new Map()
+
+    while(steps.length>0){
+        let next =nextSteps({steps, deps, followers:data.followers})
+        let foundWorker = false
+        next.forEach(el=>{
+            if(!workers.has(el) && workers.size < workerAmount)
+            {
+                workers.set(el,delay+el.charCodeAt(0)-64)
+            }
+        })
+        let minDelayWorker = {d:Infinity}
+        for (let [s, d] of workers) {
+            if(d < minDelayWorker.d) minDelayWorker = {s,d}
+        }
+        //console.log(workers,minDelayWorker, time);
+        ({steps, deps}) = doStep({steps, deps, followers:data.followers}, minDelayWorker.s)
+        workers.delete(minDelayWorker.s)
+        for (let [s, d] of workers) {
+            workers.set(s, d-minDelayWorker.d)
+        }
+        time += minDelayWorker.d
+        stepsDone += minDelayWorker.s;
+    }
+
+    return {stepsDone, time}
+}
+function nextSteps(data) {
+    const steps = data.steps;
+    const available = []
+    for (let i = 0; i < steps.length; i++) {
+      if (!data.deps.has(steps[i]) || data.deps.get(steps[i]) === "")
+        available.push( steps[i]);
+    }
+    return available
+  }
+  
+
+  let res2 = doAllWithTime(input, 60, 5)
+  res2
