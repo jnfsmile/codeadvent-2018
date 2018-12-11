@@ -1,15 +1,15 @@
 const utInput = `2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2`.split(" ").map(Number);
 console.log(utInput.slice(5, -5));
-/* const ut1 = (input => getNodeMetadata(input))(utInput.slice(9, 12));
+const ut1 = (input => getNodeMetadata(input))(utInput.slice(9, 12));
 assert(ut1.list[0] === 99);
-assert(ut1.list.length === 1); */
-/* const ut2 = (input => getNodeMetadata(input))(utInput.slice(7, 13));
+assert(ut1.list.length === 1);
+const ut2 = (input => getNodeMetadata(input))(utInput.slice(7, 13));
 assert(ut2.list[0] === 99);
 assert(ut2.list.length === 2);
 const ut3 = (input => getNodeMetadata(input))(utInput);
 assert(ut3.list.length === 8);
 assert(ut3.list.reduce((s, a) => s + a, 0) === 138);
- */
+
 const utInput2 = `2 3 1 3 2 2 1 0 0 3 3 9 2 0 2 8 2 5 3 10 11 12 1 1 0 1 99 2 1 1 2`
   .split(" ")
   .map(Number);
@@ -19,7 +19,6 @@ const utInput2 = `2 3 1 3 2 2 1 0 0 3 3 9 2 0 2 8 2 5 3 10 11 12 1 1 0 1 99 2 1 
 //                            F------------ H------
 //                                G--------
 const ut4 = (input => getNodeMetadata(input))(utInput2);
-console.log(ut4);
 assert(ut4.list.length === 15);
 
 function getNodeMetadata(list) {
@@ -50,3 +49,40 @@ const input = `8 11 7 2 4 3 3 6 1 5 0 11 6 7 4 4 7 1 5 9 8 1 8 3 1 2 1 2 1 7 0 7
 
 let res = getNodeMetadata(input);
 console.log(res.list.reduce((s, a) => s + a, 0));
+
+/**************
+ * part 2
+ */
+
+const ut5 = (input => getNodeValue(input))(utInput.slice(9, 12));
+assert(ut5.val === 99);
+const ut6 = (input => getNodeValue(input))(utInput.slice(2, 7));
+assert(ut6.val === 33);
+const ut7 = (input => getNodeValue(input))(utInput.slice());
+assert(ut7.val === 66);
+
+function getNodeValue(list) {
+  const children = list[0];
+  const myChildren = [];
+  const md = list[1];
+  if (children === 0) {
+    const myMd = list.slice(2, 2 + md);
+    return { val: myMd.reduce((a, e) => e + a, 0), rest: list.slice(2 + md) };
+  }
+  let allChildrenMd = [];
+  let rest = list.slice(2);
+  for (let i = 0; i < children; i++) {
+    let child = getNodeValue(rest);
+    rest = child.rest;
+    myChildren[i] = child;
+  }
+  let myMD = rest.slice(0, md);
+  let myVal = 0;
+  myMD.forEach(d => {
+    myVal += myChildren[d-1] ? myChildren[d-1].val : 0;
+  });
+  let result = allChildrenMd.concat(myMD);
+  return { val: myVal, rest: rest.slice(md) };
+}
+let res2 = getNodeValue(input);
+res2;
