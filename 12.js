@@ -75,7 +75,7 @@ function parseInput(oRules, oState) {
   return { rules, state };
 }
 
-/* const ut0 = ((r, s) => r.traverse("...##"))(utInput.rules, utInput.state);
+const ut0 = ((r, s) => r.traverse("...##"))(utInput.rules, utInput.state);
 assert(ut0 === "#");
 const ut0_2 = ((r, s) => r.traverse("##.##"))(utInput.rules, utInput.state);
 assert(ut0_2 === "#");
@@ -83,7 +83,7 @@ const ut0_3 = ((r, s) => r.traverse("..###"))(utInput.rules, utInput.state);
 assert(ut0_3 === ".");
 const ut0_4 = ((r, s) => r.traverse("#####"))(utInput.rules, utInput.state);
 assert(ut0_4 === ".");
- */
+
 const ut1 = ((r, s) => nextGeneration(r, s))(utInput.rules, utInput.state);
 assert(ut1[0] === ".");
 assert(ut1[3] === ".");
@@ -116,11 +116,32 @@ function sumPots(state, offset) {
 
 function runGenerations(rules, state, generations) {
   let currentState = state;
+  let offset = generations * 2;
+
+  let cache = new Map();
 
   for (let i = 0; i < generations; i++) {
+    let cacheState = currentState.replace(/^\.+/, "").replace(/\.+$/, "");
+    if (cache.has(cacheState)) {
+      let cached = cache.get(cacheState);
+      let genStep = i - cached.gen;
+      if (generations % genStep === cached.gen % genStep) {
+        let steps = Math.floor((generations - cached.gen) / genStep);
+        let phase =
+          currentState.indexOf("#") -
+          cached.real.indexOf("#") -
+          2 * (i - cached.gen);
+        let newOffset = cached.gen * 2 - steps * phase;
+        return {
+          state: cached.real,
+          offset: newOffset
+        };
+      }
+    }
+    cache.set(cacheState, { gen: i, real: currentState });
     currentState = nextGeneration(rules, currentState);
   }
-  return { state: currentState, offset: 2 * generations };
+  return { state: currentState, offset };
 }
 
 function nextGeneration(rules, state) {
@@ -132,7 +153,8 @@ function nextGeneration(rules, state) {
   return newState;
 }
 
-const input = parseInput(`#.... => .
+const input = parseInput(
+  `#.... => .
 #..## => #
 ....# => .
 ...#. => .
@@ -163,9 +185,18 @@ const input = parseInput(`#.... => .
 #.##. => #
 ##.## => .
 ..##. => .
-#...# => #`, `##...#......##......#.####.##.#..#..####.#.######.##..#.####...##....#.#.####.####.#..#.######.##...`)
+#...# => #`,
+  `##...#......##......#.####.##.#..#..####.#.######.##..#.####...##....#.#.####.####.#..#.######.##...`
+);
 
-let s = runGenerations(input.rules, input.state, 20)
-s;
-let res = sumPots(s.state, s.offset)
+let s = runGenerations(input.rules, input.state, 20);
+let res = sumPots(s.state, s.offset);
 res;
+
+/****************
+ * part 2
+ */
+
+let s2 = runGenerations(input.rules, input.state, 50000000000);
+let res2 = sumPots(s2.state, s2.offset);
+res2;
