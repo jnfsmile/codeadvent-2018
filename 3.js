@@ -41,8 +41,8 @@ function findOverlap(claims) {
   for (let pointMap of fab.values()) {
     for (let point of pointMap.keys()) {
       if (allHash.has(point)) {
-          let x = allHash.get(point)
-          allHash.set(point, x+1)
+        let x = allHash.get(point);
+        allHash.set(point, x + 1);
         if (allHash.get(point) === 1) {
           sum++;
         }
@@ -1465,5 +1465,102 @@ const input = `#1 @ 151,671: 11x15
 #1409 @ 285,437: 10x26`;
 
 const sinput = input.split("\n");
-const res = findOverlap(sinput);
-res;
+//const res = findOverlap(sinput);console.log(res);
+
+/***********
+ * part 2
+ */
+let utInput = `#1 @ 1,3: 4x4
+#2 @ 3,1: 4x4
+#3 @ 5,5: 2x2`;
+let ut4 = (input => noOverlap(input.split("\n"), 4))(utInput);
+assert(ut4 === 3);
+/* let ut5 = (input => findNoOverlap(input.split("\n"), 4))(utInput);
+assert(ut5 === "3"); */
+
+function noOverlap(sinput) {
+  const singleIds = Array(sinput.length - 1 + 1)
+    .fill()
+    .map((_, idx) => 1 + idx);
+  const singleSet = new Set(singleIds);
+
+  for (let i = 0; i < sinput.length; i++) {
+    let clone = sinput.slice();
+    const p = clone.splice(i, 1);
+    const pointToIdsMap = mapOverlapIds(clone);
+    const overlapSet = new Set();
+    for (const ids of pointToIdsMap.values()) {
+      if (ids.length > 1) ids.forEach(overlapSet.add, overlapSet);
+    }
+    if (overlapSet.size === sinput.length - 1) {
+      const difference = new Set(
+        [...singleSet].filter(x => !overlapSet.has(x))
+      );
+      const iterator1 = difference.values();
+      return iterator1.next().value;
+    }
+  }
+  return 0;
+}
+
+function mapOverlapIds(claims) {
+  const fab = claims.map(usedFabric);
+  const map = new Map();
+  let sum = 0;
+  for (let i = 0; i < fab.length; i++) {
+    for (let point of fab[i].keys()) {
+      if (map.has(point)) {
+        const current = map.get(point);
+        current.push(i + 1);
+        map.set(point, current);
+      } else {
+        map.set(point, [i + 1]);
+      }
+    }
+  }
+  return map;
+}
+
+function findNoOverlap(claims) {
+  let data = claims.map(claim => {
+    let start = claim.substring(claim.indexOf("@") + 2, claim.indexOf(":"));
+    let size = claim.substring(claim.indexOf(":") + 2);
+    let [x, y] = start.split(",").map(Number);
+    let [w, h] = size.split("x").map(Number);
+    let id = Number(claim.substring(1, claim.indexOf(" ")));
+    return { id, x, y, w, h };
+  });
+  let ids = data.map(d=>d.id)
+  let noOl = new Set(ids);
+  data.sort((a, b) => {
+    if (a.x < b.x) return -1;
+    if (a.x > b.x) return 1;
+    return 0;
+  });
+  
+  let overlap = new Set();
+  let id = "";
+  for (let j = 0; j < data.length; j++) {
+    let ol = false;
+    let c = data[j];
+    for (let i = j + 1; i < data.length; i++) {
+      let d = data[i];
+      if (c.x + c.w <= d.x) break;
+      if (
+        c.y === d.y ||
+        (c.y < d.y && c.y + c.h > d.y) ||
+        (c.y > d.y && d.y + d.h > c.y)
+      ) {
+        overlap.add(d.id);
+        overlap.add(c.id);
+        noOl.delete(d.id);
+        noOl.delete(c.id);
+      }
+    }
+  }
+  id = noOl.values().next().value;
+  return id;
+}
+const res2 = findNoOverlap(sinput);
+res2;
+//const res2 = noOverlap(sinput);console.log(res2);

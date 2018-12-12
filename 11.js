@@ -1,10 +1,10 @@
-const ut1 = ((ipt, grid) => getcellPower(ipt, grid))({ x: 3, y: 5 }, 8);
+const ut1 = ((ipt, grid) => getCellPower(ipt, grid))({ x: 3, y: 5 }, 8);
 assert(ut1 === 4);
-const ut2 = ((ipt, grid) => getcellPower(ipt, grid))({ x: 122, y: 79 }, 57);
+const ut2 = ((ipt, grid) => getCellPower(ipt, grid))({ x: 122, y: 79 }, 57);
 assert(ut2 === -5);
-const ut3 = ((ipt, grid) => getcellPower(ipt, grid))({ x: 217, y: 196 }, 39);
+const ut3 = ((ipt, grid) => getCellPower(ipt, grid))({ x: 217, y: 196 }, 39);
 assert(ut3 === 0);
-const ut4 = ((ipt, grid) => getcellPower(ipt, grid))({ x: 101, y: 153 }, 71);
+const ut4 = ((ipt, grid) => getCellPower(ipt, grid))({ x: 101, y: 153 }, 71);
 assert(ut4 === 4);
 
 const ut4_1 = (ipt => getGridPower(ipt))([[4, 4, 4], [3, 3, 4], [1, 2, 4]]);
